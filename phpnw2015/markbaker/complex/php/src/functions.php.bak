@@ -1,0 +1,388 @@
+<?php
+
+/**
+ *
+ * Function code for the complex number function
+ *
+ * @copyright  Copyright (c) 2013-2015 Mark Baker (https://github.com/MarkBaker/PHPComplex)
+ * @license    http://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt    LGPL
+ */
+namespace Complex;
+
+final class functions
+{
+    /**
+     * Returns the absolute value (modulus) of a complex number.
+     * Also known as the rho of the complex number, i.e. the distance/radius
+     *   from the centrepoint to the representation of the number in polar coordinates.
+     *
+     * This function is a synonym for rho()
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    \real            The absolute (or rho) value of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     *
+     * @see    rho
+     *
+     */
+    public static function abs($complex)
+    {
+        return self::rho($complex);
+    }
+
+    /**
+     * Returns the inverse cosine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse cosine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function acos($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        $square = clone $complex;
+        $square = $square->multiply($complex);
+        $invsqrt = new Complex(1.0);
+        $invsqrt = $invsqrt->subtract($square);
+        $invsqrt = sqrt($invsqrt);
+        $adjust = new Complex(
+            $complex->getReal() - $invsqrt->getImaginary(),
+            $complex->getImaginary() + $invsqrt->getReal()
+        );
+        $log = ln($adjust);
+
+        return new Complex(
+            $log->getImaginary(),
+            -1 * $log->getReal()
+        );
+    }
+
+    /**
+     * Returns the inverse hyperbolic cosine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse hyperbolic cosine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function acosh($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if (($complex->getImaginary() == 0.0) && ($complex->getReal() > 1)) {
+            return new Complex(\acosh($complex->getReal()), 0.0, $complex->getSuffix());
+        }
+
+        $acosh = acos($complex);
+        $acosh->reverse();
+        if ($acosh->getReal() < 0.0) {
+            $acosh->invertReal();
+        }
+
+        return $acosh;
+    }
+
+    /**
+     * Returns the inverse cotangent of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse cotangent of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     * @throws    \InvalidArgumentException    If function would result in a division by zero
+     */
+    public function acot($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        return atan(inverse($complex));
+    }
+
+    /**
+     * Returns the inverse hyperbolic cotangent of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse hyperbolic cotangent of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     * @throws    \InvalidArgumentException    If function would result in a division by zero
+     */
+    public function acoth($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        return atanh(inverse($complex));
+    }
+
+    /**
+     * Returns the inverse cosecant of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse cosecant of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     * @throws    \InvalidArgumentException    If function would result in a division by zero
+     */
+    public function acsc($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
+            return INF;
+        }
+
+        return asin(inverse($complex));
+    }
+
+    /**
+     * Returns the inverse hyperbolic cosecant of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse hyperbolic cosecant of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     * @throws    \InvalidArgumentException    If function would result in a division by zero
+     */
+    public function acsch($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
+            return INF;
+        }
+
+        return asinh(inverse($complex));
+    }
+
+    /**
+    * Returns the argument of a complex number.
+    * Also known as the theta of the complex number, i.e. the angle in radians
+    *   from the real axis to the representation of the number in polar coordinates.
+    *
+    * This function is a synonym for theta()
+    *
+    * @param     Complex|mixed    $complex    Complex number or a numeric value.
+    * @return    \real            The argument (or theta) value of the complex argument.
+    * @throws    \Exception       If argument isn't a valid real or complex number.
+    *
+    * @see    theta
+    */
+    public function argument($complex)
+    {
+        return self::theta($complex);
+    }
+
+    /**
+     * Returns the inverse secant of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse secant of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     * @throws    \InvalidArgumentException    If function would result in a division by zero
+     */
+    public function asec($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
+            return INF;
+        }
+
+        return acos(inverse($complex));
+    }
+
+    /**
+    * Returns the inverse hyperbolic secant of a complex number.
+    *
+    * @param     Complex|mixed    $complex    Complex number or a numeric value.
+    * @return    Complex          The inverse hyperbolic secant of the complex argument.
+    * @throws    \Exception       If argument isn't a valid real or complex number.
+    * @throws    \InvalidArgumentException    If function would result in a division by zero
+    */
+    public function asech($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getReal() == 0.0 && $complex->getImaginary() == 0.0) {
+            return INF;
+        }
+
+        return acosh(inverse($complex));
+    }
+
+    /**
+     * Returns the inverse sine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse sine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function asin($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        $square = clone $complex;
+        $square = $square->multiply($complex);
+        $invsqrt = new Complex(1.0);
+        $invsqrt = $invsqrt->subtract($square);
+        $invsqrt = sqrt($invsqrt);
+        $adjust = new Complex(
+            $invsqrt->getReal() - $complex->getImaginary(),
+            $invsqrt->getImaginary() + $complex->getReal()
+        );
+        $log = ln($adjust);
+
+        return new Complex(
+            $log->getImaginary(),
+            -1 * $log->getReal()
+        );
+    }
+
+    /**
+     * Returns the inverse hyperbolic sine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The inverse hyperbolic sine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function asinh($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if (($complex->getImaginary() == 0.0) && ($complex->getReal() > 1)) {
+            return new Complex(\asinh($complex->getReal()), 0.0, $complex->getSuffix());
+        }
+
+        $asinh = clone $complex;
+        $asinh->reverse();
+        $asinh->invertReal();
+        $asinh = asin($asinh);
+        $asinh->reverse();
+        $asinh->invertImaginary();
+
+        return $asinh;
+    }
+
+    /**
+    * Returns the inverse tangent of a complex number.
+    *
+    * @param     Complex|mixed    $complex    Complex number or a numeric value.
+    * @return    Complex          The inverse tangent of the complex argument.
+    * @throws    \Exception       If argument isn't a valid real or complex number.
+    * @throws    \InvalidArgumentException    If function would result in a division by zero
+    */
+    public function atan($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getImaginary() == 0.0) {
+            return new Complex(\atan($complex->getReal()), 0.0, $complex->getSuffix());
+        }
+
+        $t1Value = new Complex(-1 * $complex->getImaginary(), $complex->getReal());
+        $uValue = new Complex(1, 0);
+
+        $d1Value = clone $uValue;
+        $d1Value->subtract($t1Value);
+        $d2Value = $t1Value->add($uValue);
+        $uResult = $d1Value->divideBy($d2Value);
+        $uResult = ln($uResult);
+
+        return new Complex(
+            (($uResult->getImaginary() == M_PI) ? -M_PI : $uResult->getImaginary()) * -0.5,
+            $uResult->getReal() * 0.5,
+            $complex->getSuffix()
+        );
+    }
+
+    /**
+    * Returns the inverse hyperbolic tangent of a complex number.
+    *
+    * @param     Complex|mixed    $complex    Complex number or a numeric value.
+    * @return    Complex          The inverse hyperbolic tangent of the complex argument.
+    * @throws    \Exception       If argument isn't a valid real or complex number.
+    */
+    public function atanh($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        $imaginary = $complex->getImaginary();
+        if ($imaginary == 0.0 ) {
+            $real = $complex->getReal();
+            if ($real > -1.0 && $real < 1.0) {
+                return new Complex(\atanh($real), 0.0, $complex->getSuffix());
+            } else {
+                return new Complex(\atanh(1 / $real), (($real < 0.0) ? M_PI_2 : -1 * M_PI_2));
+            }
+        }
+
+        $iComplex = clone $complex;
+        $iComplex->invertImaginary();
+        $iComplex->reverse();
+        $result = atan($iComplex);
+        $result->invertReal();
+        $result->reverse();
+
+        return $result;
+    }
+
+    /**
+     * Returns the complex conjugate of a complex number
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The conjugate of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function conjugate($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        return new Complex(
+            $complex->getReal(),
+            -1 * $complex->getImaginary(),
+            $complex->getSuffix()
+        );
+    }
+
+    /**
+     * Returns the cosine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The cosine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function cos($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getImaginary() == 0.0) {
+            return new Complex(\cos($complex->getReal()), 0.0, $complex->getSuffix());
+        }
+
+        return conjugate(
+            new Complex(
+                \cos($complex->getReal()) * \cosh($complex->getImaginary()),
+                \sin($complex->getReal()) * \sinh($complex->getImaginary()),
+                $complex->getSuffix()
+            )
+        );
+    }
+
+    /**
+     * Returns the hyperbolic cosine of a complex number.
+     *
+     * @param     Complex|mixed    $complex    Complex number or a numeric value.
+     * @return    Complex          The hyperbolic cosine of the complex argument.
+     * @throws    \Exception       If argument isn't a valid real or complex number.
+     */
+    public function cosh($complex)
+    {
+        $complex = Complex::validateComplexArgument($complex);
+
+        if ($complex->getImaginary() == 0.0) {
+            return new Complex(\cosh($complex->getReal()), 0.0, $complex->getSuffix());
+        }
+
+        return new Complex(
+            \cosh($complex->getReal()) * \cos($complex->getImaginary()),
+            \sinh($complex->getReal()) * \sin($complex->getImaginary()),
+            $complex->getSuffix()
+        );
+    }
+}

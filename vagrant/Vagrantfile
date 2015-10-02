@@ -1,0 +1,49 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+def Kernel.is_windows?
+    # Detect if we are running on Windows
+    processor, platform, *rest = RUBY_PLATFORM.split("-")
+    platform == 'mingw32'
+end
+
+
+Vagrant::Config.run do |config|
+    # Your local name for the basebox you want to use.
+    config.vm.box = "precise64"
+    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+#    config.vm.box = "vagrant-zephir"
+#    config.vm.box_url = "file://./vagrant-zephir.box"
+        
+    config.vm.customize [
+        "modifyvm", :id,
+        "--name", "phpnw2015_Zephir",
+        "--memory", "1024"
+    ]
+
+    # Assign this VM to a host-only network IP, allowing you to access it
+    # via the IP. Host-only networks can talk to the host machine as well as
+    # any other machines on the same network, but cannot be accessed (through this
+    # network interface) by any external networks.
+    config.vm.network :hostonly, "192.168.44.10"
+
+    # Use the vagrant hostmaster plugin to automatically add a domain name
+    config.vm.host_name = "www.zephir.vm"
+
+    # Share an additional folder to the guest VM. The first argument is
+    # an identifier, the second is the path on the guest to mount the
+    # folder, and the third is the path on the host to the actual folder.
+    # You can add as many of these as you like, anywhere you like
+    use_nfs = !Kernel.is_windows?
+    config.vm.share_folder "v-phpnw2015", "/srv/phpnw2015", "../phpnw2015", :nfs => use_nfs
+
+    # Enable provisioning with chef solo, specifying a cookbooks path, roles
+    # path, and data_bags path (all relative to this Vagrantfile), and adding
+    # some recipes and/or roles.
+#    config.vm.provision :chef_solo do |chef|
+#        chef.roles_path = "../chef/roles"
+#        chef.cookbooks_path = ["../chef/site-cookbooks", "../chef/cookbooks"]
+#        chef.add_role "ww"
+#    end
+
+end
